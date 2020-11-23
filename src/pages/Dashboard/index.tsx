@@ -1,50 +1,60 @@
-import React from 'react';
+import React, { useState, FormEvent } from 'react';
 import { Title, Form, Repositories } from './styles';
 import { FiChevronRight } from 'react-icons/fi';
+import api from '../../services/api';
+
 import logoImg from '../../assets/logo.svg';
+
+interface Repository {
+  full_name: string;
+  description: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
+}
+
 const Dashboard: React.FC = () => {
+  const [newRepo, setnewRepo] = useState('gustavolopesv3');
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  async function handleAddRepositorie(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    //add new repo
+    const response = await api.get<Repository>(`repos/${newRepo}`);
+    const repository = response.data;
+
+    setRepositories([...repositories, repository]);
+    setnewRepo('');
+  }
+
   return (
     <>
       <img src={logoImg} alt="Github Explorer" />
       <Title>Explore Repositorios no gitHub</Title>
-      <Form>
-        <input type="text" placeholder="Digite o nome do repositorio" />
+      <Form onSubmit={handleAddRepositorie}>
+        <input
+          value={newRepo}
+          type="text"
+          onChange={(e) => setnewRepo(e.target.value)}
+          placeholder="Digite o nome do repositorio"
+        />
         <button type="submit">Pesquisar</button>
       </Form>
       <Repositories>
-        <a href="teste">
-          <img
-            src="https://avatars1.githubusercontent.com/u/38574162?s=460&u=214063de7a21a67c111c02296c8e4eb9ab251584&v=4"
-            alt="Gustavo lopes"
-          />
-          <div>
-            <strong>gustavolopesv3/myprofile</strong>
-            <p>my professional profile and portfolio</p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
-        <a href="teste">
-          <img
-            src="https://avatars1.githubusercontent.com/u/38574162?s=460&u=214063de7a21a67c111c02296c8e4eb9ab251584&v=4"
-            alt="Gustavo lopes"
-          />
-          <div>
-            <strong>gustavolopesv3/myprofile</strong>
-            <p>my professional profile and portfolio</p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
-        <a href="teste">
-          <img
-            src="https://avatars1.githubusercontent.com/u/38574162?s=460&u=214063de7a21a67c111c02296c8e4eb9ab251584&v=4"
-            alt="Gustavo lopes"
-          />
-          <div>
-            <strong>gustavolopesv3/myprofile</strong>
-            <p>my professional profile and portfolio</p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
+        {repositories.map((repository) => (
+          <a key={repository.full_name} href="teste">
+            <img
+              src={repository.owner.avatar_url}
+              alt={repository.owner.login}
+            />
+            <div>
+              <strong>{repository.full_name}</strong>
+              <p>{repository.description}</p>
+            </div>
+            <FiChevronRight size={20} />
+          </a>
+        ))}
       </Repositories>
     </>
   );
