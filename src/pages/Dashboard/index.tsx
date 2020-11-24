@@ -16,7 +16,7 @@ interface Repository {
 }
 
 const Dashboard: React.FC = () => {
-  const [newRepo, setnewRepo] = useState('gustavolopesv3');
+  const [newRepo, setnewRepo] = useState('');
   const [inputError, setInputError] = useState('');
   const [repositories, setRepositories] = useState<Repository[]>(() => {
     const storagedRepositories = localStorage.getItem(
